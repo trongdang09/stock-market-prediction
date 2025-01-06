@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                
+                <!-- Form upload CSV -->
+                <div class="form-group">
+                    <h4>Upload dữ liệu CSV để dự đoán</h4>
+                    <form action="{{ url_for('main.predict_from_csv') }}" method="post" enctype="multipart/form-data" id="prediction-form">
+                        <div class="mb-3">
+                            <label for="csvFile" class="form-label">Chọn file CSV:</label>
+                            <input type="file" class="form-control" id="csvFile" name="file" accept=".csv" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">Dữ liệu từ ngày:</label>
+                                <input type="date" class="form-control" id="startDate" name="start_date">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">Đến ngày:</label>
+                                <input type="date" class="form-control" id="endDate" name="end_date">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="predictionModel">Chọn mô hình:</label>
+                            <select class="form-control" id="predictionModel" name="model_type">
+                                <option value="arima">ARIMA Model</option>
+                                <option value="lstm">LSTM Model</option>
+                            </select>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="predictionStartDate" class="form-label">Dự đoán từ ngày:</label>
+                                <input type="date" class="form-control" id="predictionStartDate" name="prediction_start_date">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="predictionEndDate" class="form-label">Đến ngày:</label>
+                                <input type="date" class="form-control" id="predictionEndDate" name="prediction_end_date">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">Upload & Dự đoán</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Khu vực hiển thị kết quả -->
+<div class="row mt-4" id="results-section" style="display: none;">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h4>Biểu đồ dự đoán</h4>
+                <div id="prediction-chart" style="height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h4>Kết quả dự đoán</h4>
+                <div class="table-responsive"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="text-center mt-3">
+    <a href="{{ url_for('main.comparison') }}" class="btn btn-primary">So Sánh Kết Quả</a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if chart_data and show_results %}
+    const data = {{ chart_data | tojson }};
+    
+    // Hiển thị khu vực kết quả
+    document.getElementById('results-section').style.display = 'flex';
+    
+    // Dữ liệu lịch sử
+    const historical = {
+        x: data.dates,
+        y: data.historical,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Giá thực tế',
+        line: {
+            color: 'blue'
+        }
+    };
+
+    // Dữ liệu dự đoán
+    const prediction = {
+        x: data.future_dates,
+        y: data.predictions,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Dự đoán',
+        line: {
+            color: 'red',
+            dash: 'dot'
+        }
+    };
+
+    const layout = {
+        title: 'Dự đoán giá cổ phiếu',
+        showlegend: true,
+        xaxis: {
+            title: 'Ngày'
+        },
+        yaxis: {
+            title: 'Giá'
+        }
+    };
+
+    Plotly.newPlot('prediction-chart', [historical, prediction], layout);
+    
+    // Hiển thị bảng kết quả dự đoán nếu có
+    if ({{ prediction_result|tojson }}) {
+        document.querySelector('.table-responsive').innerHTML = {{ prediction_result|tojson|safe }};
+    }
+    {% endif %}
+});
+</script>
+
+<style>
+    #results-section {
+        margin-top: 2rem;
+    }
+    
+    .table-responsive {
+        margin-top: 1rem;
+    }
+    
+    .prediction-chart {
+        min-height: 400px;
+    }
+    
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .table th:last-child {
+        display: none;
+      
+    }
+    
+    .table td:first-child {  /* Cột ngày tháng */
+        min-width: 100px;
+    }
+    
+    .table td:nth-child(2) {  /* Cột giá dự đoán */
+        min-width: 120px;
+        font-weight: 500;
+    }
+    
+    .table td:last-child {  
+        display: none;/* Cột độ tin cậy */
+        min-width: 100px;
+        color: #28a745;
+        
+    }
+</style>
+{% endblock %} 

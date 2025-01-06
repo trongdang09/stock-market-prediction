@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">So Sánh Kết Quả Dự Đoán</h2>
+    
+    <div class="row">
+        <!-- Bảng so sánh -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Bảng So Sánh Kết Quả</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Thời Gian</th>
+                                    <th>ARIMA</th>
+                                    <th>LSTM</th>
+                                    <!-- <th>Chênh Lệch</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in range(arima_prediction|default([])|length) %}
+                                <tr>
+                                    <td>{{ i + 1 }}</td>
+                                    <td>{{ "%.2f"|format(arima_prediction[i]) }}</td>
+                                    <td>{{ "%.2f"|format(lstm_prediction[i]) }}</td>
+                                    <!-- <td>{{ "%.2f"|format(arima_prediction[i] - lstm_prediction[i]) }}</td> -->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ so sánh -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Biểu Đồ So Sánh</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script vẽ biểu đồ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    const arimaData = {{ arima_prediction|tojson }};
+    const lstmData = {{ lstm_prediction|tojson }};
+    const labels = Array.from({length: arimaData.length}, (_, i) => i + 1);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'ARIMA',
+                data: arimaData,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'LSTM',
+                data: lstmData,
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

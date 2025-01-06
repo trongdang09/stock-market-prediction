@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Lịch sử dự đoán</h3>
+                    
+                    <!-- Bộ lọc -->
+                    <div class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="symbolFilter">Mã cổ phiếu</label>
+                                    <input type="text" class="form-control" id="symbolFilter" placeholder="Nhập mã cổ phiếu">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button class="btn btn-primary w-100" onclick="filterHistory()">Lọc</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bảng lịch sử -->
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Mã cổ phiếu</th>
+                                    <th>Giá hiện tại</th>
+                                    <th>Giá dự đoán</th>
+                                    <th>Ngày dự đoán</th>
+                                    <th>Thời gian tạo</th>
+                                    <th>Độ chính xác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadPredictionHistory() {
+    try {
+        const symbol = document.getElementById('symbolFilter').value;
+        const url = symbol 
+            ? `/api/predictions/history/${symbol}`
+            : '/api/predictions/history';
+            
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Lỗi khi tải lịch sử dự đoán: ' + data.error);
+            return;
+        }
+        
+        updateHistoryTable(data.data);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi tải lịch sử dự đoán');
+    }
+}
+
+function updateHistoryTable(predictions) {
+    const tbody = document.getElementById('historyTableBody');
+    tbody.innerHTML = '';
+    
+    predictions.forEach(pred => {
+        // Tính độ chính xác
+        const currentPrice = parseFloat(pred.current_price);
+        const predictedPrice = parseFloat(pred.predicted_price);
+        const accuracy = calculateAccuracy(currentPrice, predictedPrice);
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${pred.symbol}</td>
+            <td>${formatPrice(pred.current_price)}</td>
+            <td>${formatPrice(pred.predicted_price)}</td>
+            <td>${formatDate(pred.prediction_date)}</td>
+            <td>${formatDateTime(pred.created_at)}</td>
+            <td>${accuracy}%</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function calculateAccuracy(current, predicted) {
+    const difference = Math.abs(current - predicted);
+    const accuracy = (1 - difference / current) * 100;
+    return accuracy.toFixed(2);
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(price);
+}
+
+function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleDateString('vi-VN');
+}
+
+function formatDateTime(dateTimeStr) {
+    return new Date(dateTimeStr).toLocaleString('vi-VN');
+}
+
+function filterHistory() {
+    loadPredictionHistory();
+}
+
+// Load lịch sử khi trang được tải
+document.addEventListener('DOMContentLoaded', loadPredictionHistory);
+</script>
+{% endblock %}

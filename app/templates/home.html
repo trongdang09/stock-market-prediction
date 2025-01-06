@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Roboto', sans-serif;
+        line-height: 1.8;
+        color: #2c3e50;
+    }
+
+    .card {
+        background-color: #ffffff;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-top: 30px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+        font-size: 2.4em;
+        color: #2563eb;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+        background: linear-gradient(45deg, #2563eb, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .card-text {
+        font-size: 1.1em;
+        text-align: justify;
+        line-height: 1.8;
+        color: #4b5563;
+    }
+
+    .img-fluid {
+        border-radius: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .img-fluid:hover {
+        transform: scale(1.02);
+    }
+
+    .row {
+        margin-bottom: 35px;
+    }
+
+    /* Styling for market data */
+    .list-unstyled li {
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 1.1em;
+    }
+
+    .list-unstyled li:last-child {
+        border-bottom: none;
+    }
+
+    .list-unstyled strong {
+        color: #2563eb;
+        margin-right: 10px;
+    }
+
+    /* Market indicators */
+    .market-indicator {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 8px;
+        margin-left: 10px;
+    }
+
+    .indicator-up {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .indicator-down {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    @media (max-width: 768px) {
+        .card {
+            padding: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.8em;
+        }
+        
+        .card-text {
+            font-size: 1em;
+        }
+        
+        .list-unstyled li {
+            font-size: 1em;
+        }
+    }
+</style>
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <h2 class="card-title mb-4">Chào mừng đến với Dự Đoán Thị Trường Chứng Khoán Với AI</h2>
+                        <p class="card-text">
+                            Thị trường chứng khoán luôn biến động và tiềm ẩn nhiều rủi ro, đòi hỏi nhà đầu tư phải nắm bắt thông tin kịp thời và chính xác. Với sự phát triển của trí tuệ nhân tạo (AI), việc dự đoán xu hướng thị trường trở nên nhanh chóng và hiệu quả hơn bao giờ hết. Dự đoán chứng khoán bằng AI ra đời nhằm cung cấp giải pháp phân tích và dự đoán thị trường chứng khoán dựa trên các mô hình tiên tiến như ARIMA và LSTM. Chúng tôi giúp nhà đầu tư giảm thiểu rủi ro, đưa ra quyết định thông minh và tối ưu hóa lợi nhuận trong bối cảnh thị trường ngày càng phức tạp.
+                        </p>
+                    </div>
+                    <div class="col-md-5">
+                        <img src="{{ url_for('static', filename='images/1.jpg') }}" 
+                             alt="Stock Market Analysis" 
+                             class="img-fluid rounded shadow-lg" 
+                             style="width: 100%; height: auto; max-height: 400px; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">Thị Trường Chứng Khoán Hiện Tại</h3>
+                <p class="card-text">Thị trường chứng khoán đang trải qua những biến động mạnh mẽ, với nhiều cơ hội và thách thức cho các nhà đầu tư. Dưới đây là một số thông tin nổi bật:</p>
+                <ul class="list-unstyled">
+                    <li><strong>Chỉ số VN-Index:</strong> 1,200.00 <span class="market-indicator indicator-up">+1.5%</span></li>
+                    <li><strong>Chỉ số HNX-Index:</strong> 300.00 <span class="market-indicator indicator-up">+0.8%</span></li>
+                    <li><strong>Top Gainers:</strong> CTG, VHM, FPT</li>
+                    <li><strong>Top Losers:</strong> VNM, GAS, MSN</li>
+                </ul>
+                <p class="card-text">Các nhà đầu tư đang theo dõi sát sao các diễn biến trên thị trường để đưa ra quyết định đầu tư hợp lý. Hãy luôn cập nhật thông tin và phân tích để tối ưu hóa lợi nhuận của bạn!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

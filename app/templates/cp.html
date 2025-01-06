@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">So sánh kết quả dự đoán</h2>
+    
+    <div class="row">
+        <!-- Kết quả dự đoán -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Kết quả dự đoán</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>ARIMA</th>
+                                    <th>LSTM</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in range(arima_prediction.values|length) %}
+                                <tr>
+                                    <td>{{ arima_prediction.dates[i] }}</td>
+                                    <td>{{ "%.2f"|format(arima_prediction.values[i]) }}</td>
+                                    <td>{{ "%.2f"|format(lstm_prediction.values[i]) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ so sánh -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Biểu đồ so sánh</h4>
+                </div>
+                <div class="card-body">
+                    <div id="comparison-chart" style="height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Dữ liệu lịch sử
+    const historical = {
+        x: {{ arima_prediction.historical_data.dates | tojson }},
+        y: {{ arima_prediction.historical_data.values | tojson }},
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Dữ liệu lịch sử',
+        line: { color: 'blue' }
+    };
+
+    // Dự đoán ARIMA
+    const arimaPredict = {
+        x: {{ arima_prediction.dates | tojson }},
+        y: {{ arima_prediction.values | tojson }},
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Dự đoán ARIMA',
+        line: { color: 'red', dash: 'dot' }
+    };
+
+    // Dự đoán LSTM
+    const lstmPredict = {
+        x: {{ lstm_prediction.dates | tojson }},
+        y: {{ lstm_prediction.values | tojson }},
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Dự đoán LSTM',
+        line: { color: 'green', dash: 'dot' }
+    };
+
+    const layout = {
+        title: 'So sánh kết quả dự đoán',
+        showlegend: true,
+        xaxis: { title: 'Ngày' },
+        yaxis: { title: 'Giá' }
+    };
+
+    Plotly.newPlot('comparison-chart', [historical, arimaPredict, lstmPredict], layout);
+});
+</script>
+{% endblock %} 

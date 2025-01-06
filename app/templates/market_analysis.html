@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+            
+
+                <div class="form-group">
+                    <h4>Upload dữ liệu CSV để phân tích</h4>
+                    <form action="{{ url_for('main.upload_csv') }}" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="csvFile" class="form-label">Chọn file CSV:</label>
+                            <input type="file" class="form-control" id="csvFile" name="file" accept=".csv" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">Từ ngày:</label>
+                                <input type="date" class="form-control" id="startDate" name="start_date">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">Đến ngày:</label>
+                                <input type="date" class="form-control" id="endDate" name="end_date">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                File CSV phải có các cột: Date, Open, High, Low, Close, Volume
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-success">Upload & Phân tích</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>Biểu đồ giá</h4>
+                <div id="price-chart" style="height: 500px;"></div>
+                <div id="volume-chart" style="height: 200px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if analysis_result %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>Kết quả phân tích từ CSV</h4>
+                <div class="table-responsive">
+                    {{ analysis_result | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if chart_data %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const data = {{ chart_data | tojson }};
+    
+    // Dữ liệu cho biểu đồ nến
+    const candlestick = {
+        x: data.dates,
+        open: data.prices.open,
+        high: data.prices.high,
+        low: data.prices.low,
+        close: data.prices.close,
+        type: 'candlestick',
+        name: 'Giá',
+        yaxis: 'y1'
+    };
+
+    // Dữ liệu khối lượng
+    const volume = {
+        x: data.dates,
+        y: data.volume,
+        type: 'bar',
+        name: 'Khối lượng',
+        yaxis: 'y2',
+        marker: {
+            color: 'rgb(158,202,225)',
+            opacity: 0.5
+        }
+    };
+
+    const layout = {
+        dragmode: 'zoom',
+        showlegend: false,
+        xaxis: {
+            rangeslider: {
+                visible: false
+            }
+        },
+        yaxis: {
+            title: 'Giá',
+            autorange: true,
+            domain: [0.3, 1]
+        },
+        yaxis2: {
+            title: 'Khối lượng',
+            autorange: true,
+            domain: [0, 0.2]
+        },
+        grid: {
+            rows: 2,
+            columns: 1,
+            pattern: 'independent'
+        }
+    };
+
+    Plotly.newPlot('price-chart', [candlestick, volume], layout);
+});
+</script>
+{% endif %}
+{% endblock %} 
