@@ -102,6 +102,3 @@ Mở trình duyệt: **http://127.0.0.1:5000**
 - Trong `config.py` có thông tin Gmail thật; nên dùng biến môi trường hoặc file cấu hình riêng, không commit mật khẩu lên Git
 - Mô hình ARIMA/LSTM đã train sẵn nằm trong `app/ai_models/` (`.pkl`, `.keras`); có thể train lại qua notebook `ARIMA.ipynb`, `LSTM.ipynb`
 
-## License
-
-MIT (hoặc theo giấy phép của dự án gốc).
