@@ -87,7 +87,7 @@ Mở trình duyệt: **http://127.0.0.1:5000**
 4. **Dự đoán AI** (`/ai-prediction`) – Chọn ARIMA hoặc LSTM, upload CSV (cột Date, Close) hoặc nhập symbol, xem dự đoán và biểu đồ
 5. **So sánh** (`/cp` hoặc `/comparison`) – Sau khi chạy dự đoán với cả ARIMA và LSTM, vào trang này để so sánh
 
-## API (ví dụ)
+## API (ví dụ):
 
 - `GET /api/predict/<symbol>` – Dự đoán theo symbol (ví dụ: AAPL, BTC-USD), gửi thông báo email
 - `GET /api/predictions/history` – Lịch sử dự đoán (query: `symbol`, `limit`)
